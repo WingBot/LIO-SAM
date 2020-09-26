@@ -2,6 +2,8 @@
 #include "lio_sam/cloud_info.h"
 
 // Velodyne
+
+// Velodyne点云点结构体构造，point4d是xyz和强度intensity.ring是线数，EIGEN_MAKE_ALIGNED_OPERATOR_NEW字符对齐
 struct PointXYZIRT
 {
     PCL_ADD_POINT4D
@@ -34,8 +36,11 @@ POINT_CLOUD_REGISTER_POINT_STRUCT (PointXYZIRT,
 //     (uint8_t, ring, ring) (uint16_t, noise, noise) (uint32_t, range, range)
 // )
 
-const int queueLength = 2000;
 
+//循环imu长度，作者imu Microstrain 3DM-GX5-25,为500hz，使用loam数据集时要修改
+const int queueLength = 2000;    // 500
+
+//引用参数
 class ImageProjection : public ParamServer
 {
 private:
@@ -79,6 +84,7 @@ private:
     float odomIncreY;
     float odomIncreZ;
 
+    //这里面有imu是否可用，odo是否可用，lidar的位姿，scan中各点对应线号，各点与光心距离的信息
     lio_sam::cloud_info cloudInfo;
     double timeScanCur;
     double timeScanEnd;
@@ -174,6 +180,7 @@ public:
 
     void cloudHandler(const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg)
     {
+        //检测一下点数量是否够2个，线数通道和时间通道是否存在
         if (!cachePointCloud(laserCloudMsg))
             return;
 
@@ -272,10 +279,11 @@ public:
         return true;
     }
 
+//计算当前激光时间戳前，每个时刻imu累计出的角速度，并判定imu数据是否可用（数量够）
     void imuDeskewInfo()
     {
         cloudInfo.imuAvailable = false;
-
+        //直到imu的时间戳到当前scan时间戳前0.01s以内
         while (!imuQueue.empty())
         {
             if (imuQueue.front().header.stamp.toSec() < timeScanCur - 0.01)

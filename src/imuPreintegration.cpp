@@ -203,6 +203,9 @@ public:
 
     IMUPreintegration()
     {
+        // subscriber 订阅imu数据和激光Odom
+    // 业务逻辑都在callback里面写, 两个数据是耦合关系, imu通过激光odom给出优化后的预积分预测
+    // odom根据预测的位姿优化、融合出新的odom
         subImu      = nh.subscribe<sensor_msgs::Imu>  (imuTopic,                   2000, &IMUPreintegration::imuHandler,      this, ros::TransportHints().tcpNoDelay());
         subOdometry = nh.subscribe<nav_msgs::Odometry>("lio_sam/mapping/odometry_incremental", 5,    &IMUPreintegration::odometryHandler, this, ros::TransportHints().tcpNoDelay());
 
