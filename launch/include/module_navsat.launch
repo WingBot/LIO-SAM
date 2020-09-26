@@ -7,7 +7,7 @@
     <!-- EKF GPS-->
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_gps" respawn="true">
         <!-- <remap from="odometry/filtered" to="odometry/navsat" /> -->
-                <remap from="odometry/filtered" to="gps_odom" />
+                <remap from="odometry/filtered" to="odometry/navsat" />
 
     </node>
 
@@ -17,9 +17,9 @@
         <!-- <remap from="imu/data" to="imu_correct" /> -->
         <remap from="imu/data" to="imu/data" />
         <!-- <remap from="gps/fix" to="gps/fix" /> -->
-        <remap from="gps/fix" to="fix" />
+        <remap from="gps/fix" to="/fix" />
         <!-- <remap from="odometry/filtered" to="odometry/navsat" /> -->
-        <remap from="odometry/filtered" to="gps_odom" />
+        <remap from="odometry/filtered" to="odometry/navsat" />
     </node>
 
 </launch>
